@@ -140,7 +140,7 @@ func vote_better{
     assert j = judge
     let (res) = balance.read(user_id=better_id)
     let (prize) = bet_reserve_amount.read()
-    tempvar new_balance = res - prize
+    tempvar new_balance = res + prize
 
     # Make sure the new balance will be positive.
     assert_nn(new_balance)
