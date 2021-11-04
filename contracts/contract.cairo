@@ -170,6 +170,7 @@ func join_judge{
     let (b1) = better.read()
     let (b2) = anti_better.read()
     let (j) = bet_judge.read()
+    let (amt) = bet_amount.read()
     
     return( res = Bet (
         Better = b1,
