@@ -181,25 +181,6 @@ func join_judge{
     )
 end
 
-
-
-func withdraw{
-        syscall_ptr : felt*,  pedersen_ptr : HashBuiltin*, range_check_ptr}(
-        user_id : felt, amount : felt):
-    # Make sure 'amount' is positive.
-    assert_nn(amount)
-
-    let (res) = balance.read(user_id=user_id)
-    tempvar new_balance = res - amount
-
-    # Make sure the new balance will be positive.
-    assert_nn(new_balance)
-
-    # Update the new balance.
-    balance.write(user_id, new_balance)
-    return ()
-end
-
 # Returns the current balance of a user_id.
 @view
 func get_balance{
