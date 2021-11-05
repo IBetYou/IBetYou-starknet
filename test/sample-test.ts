@@ -42,7 +42,7 @@ describe("Starknet", function () {
 
   it("user 2 joins the bet and amount should reduce by x after joining the bet of x amount", async function() {
     const contract: StarknetContract = contractFactory.getContractAt(preservedAddress);
-    await contract.invoke("join_anti_better", [2]);
+    await contract.invoke("joinCounterBettor", [2]);
     console.log("User 2 joined the bet of amount 10");
     const balanceStr = await contract.call("get_balance", [2]);
     const balance = parseInt(balanceStr);
@@ -53,7 +53,7 @@ describe("Starknet", function () {
     const contract: StarknetContract = contractFactory.getContractAt(preservedAddress);
     await contract.invoke("join_judge", [3]);
     console.log("User 3 joined the bet as judge, and voted user 1 as winner");
-    await contract.invoke("vote_better", [3, 1]);
+    await contract.invoke("vote_bettor", [3, 1]);
     const balanceStr = await contract.call("get_balance", [1]);
     const balance = parseInt(balanceStr);
     expect(balance).to.equal(30);

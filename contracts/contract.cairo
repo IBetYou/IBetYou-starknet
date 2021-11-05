@@ -14,7 +14,7 @@ func balance(user_id: felt) -> (res : felt):
 end
 
 @storage_var
-func better() -> (res : felt):
+func bettor() -> (res : felt):
 end
 
 @storage_var
@@ -22,7 +22,7 @@ func bet_text() -> (res : felt):
 end
 
 @storage_var
-func anti_better() -> (res : felt):
+func counterBettor() -> (res : felt):
 end
 
 @storage_var
@@ -73,11 +73,11 @@ func create_bet{
     balance.write(user_id, new_balance)
     bet_reserve_amount.write(amount)
    
-    better.write(user_id)
+    bettor.write(user_id)
     bet_amount.write(amount)
     bet_text.write(bet)
-    let (b1) = better.read()
-    let (b2) = anti_better.read()
+    let (b1) = bettor.read()
+    let (b2) = counterBettor.read()
     let (j) = bet_judge.read()
     let (amt) = bet_amount.read()
     return( res = Bet (
@@ -90,7 +90,7 @@ func create_bet{
 end
 
 @external
-func join_anti_better{
+func joinCounterBettor{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
@@ -107,9 +107,9 @@ func join_anti_better{
     # Update the new balance.
     balance.write(user_id, new_balance)
     bet_reserve_amount.write(amt + amt)
-    anti_better.write(user_id)
-    let (b1) = better.read()
-    let (b2) = anti_better.read()
+    counterBettor.write(user_id)
+    let (b1) = bettor.read()
+    let (b2) = counterBettor.read()
     let (j) = bet_judge.read()
     let (amt) = bet_amount.read()
     
@@ -123,22 +123,22 @@ func join_anti_better{
 end
 
 @external
-func vote_better{
+func vote_bettor{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
-        judge : felt, better_id : felt) -> (res : Bet):
+        judge : felt, bettor_id : felt) -> (res : Bet):
     
     let (amt) = bet_amount.read()
-    let (b1) = better.read()
-    let (b2) = anti_better.read()
+    let (b1) = bettor.read()
+    let (b2) = counterBettor.read()
     let (j) = bet_judge.read()
     assert_nn(amt)
     assert_nn(b1)
     assert_nn(b2)
     assert_nn(j)
     assert j = judge
-    let (res) = balance.read(user_id=better_id)
+    let (res) = balance.read(user_id=bettor_id)
     let (prize) = bet_reserve_amount.read()
     tempvar new_balance = res + prize
 
@@ -146,7 +146,7 @@ func vote_better{
     assert_nn(new_balance)
 
     # Update the new balance.
-    balance.write(better_id, new_balance)
+    balance.write(bettor_id, new_balance)
     bet_reserve_amount.write(0)    
     
     return( res = Bet (
@@ -167,8 +167,8 @@ func join_judge{
     
     
     bet_judge.write(user_id)
-    let (b1) = better.read()
-    let (b2) = anti_better.read()
+    let (b1) = bettor.read()
+    let (b2) = counterBettor.read()
     let (j) = bet_judge.read()
     let (amt) = bet_amount.read()
     
