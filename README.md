@@ -11,6 +11,7 @@ npm install
 
 ## Use
 Make sure docker is running locally
+
 Generate the artifacts by compiling the contract using staknet-compile:
 ### `starknet-compile`
 ```
