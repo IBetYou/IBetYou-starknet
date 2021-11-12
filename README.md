@@ -14,11 +14,11 @@ Make sure docker is running locally
 Generate the artifacts by compiling the contract using staknet-compile:
 ### `starknet-compile`
 ```
-npx hardhat starknet-compile
+npx hardhat starknet-compile 
 ```
 ### `starknet-deploy`
 ```
-npx hardhat starknet-deploy
+npx hardhat starknet-deploy --starknet-network starknetLocalhost
 ```
 
 ## Test

@@ -21,6 +21,8 @@ lib64/
 parts/
 sdist/
 var/
+cache/
+starknet-artifacts/
 wheels/
 pip-wheel-metadata/
 share/python-wheels/
