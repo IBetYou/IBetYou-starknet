@@ -12,11 +12,11 @@ module.exports = {
   },
   networks: {
     starknetLocalhost: {
-      url: "http://localhost:5000"
+      url: "http://host.docker.internal:5000/"
     }
   },
   mocha: {
-    // starknetNetwork: "starknetLocalhost"
-    starknetNetwork: "alpha"
+    starknetNetwork: "starknetLocalhost"
+    // starknetNetwork: "alpha"
   }
 };
