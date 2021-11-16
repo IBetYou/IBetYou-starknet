@@ -1,4 +1,4 @@
-import "/Users/princeraj/Projects/github.com/Shard-Labs/starknet-hardhat-plugin/dist/index.js";
+import "@shardlabs/starknet-hardhat-plugin";
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more

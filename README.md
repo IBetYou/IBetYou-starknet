@@ -87,7 +87,7 @@ starknet invoke \
 starknet invoke \
     --address $CONTRACT_ADDRESS \
     --abi contract_abi.json \
-    --function join_anti_better \
+    --function join_counter_better \
     --inputs 2
 ```
 
