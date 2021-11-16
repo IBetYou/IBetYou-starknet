@@ -1,4 +1,4 @@
-import "@shardlabs/starknet-hardhat-plugin";
+import "/Users/princeraj/Projects/github.com/Shard-Labs/starknet-hardhat-plugin/dist/index.js";
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -12,7 +12,7 @@ module.exports = {
   },
   networks: {
     starknetLocalhost: {
-      url: "http://host.docker.internal:5000/"
+      url: "http://localhost:5000/"
     }
   },
   mocha: {
