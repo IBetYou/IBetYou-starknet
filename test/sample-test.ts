@@ -7,10 +7,32 @@ describe("Starknet", function () {
   let preservedAddress: string;
 
   let contractFactory: StarknetContractFactory;
-
+  let accountFactory: StarknetContractFactory;
   before(async function() {
     contractFactory = await starknet.getContractFactory("contract");
+    accountFactory = await starknet.getContractFactory("account");
   });
+
+  it("Account test", async function () {
+    const contract: StarknetContract = await accountFactory.deploy();
+    console.log("Deployed at", contract.address);
+    preservedAddress = contract.address;
+    await contract.invoke("modify_account_balance",{account_id:1628448741648245036800002906075225705100596136133912895015035902954123957052n, token_type:1, amount:4321});
+    /*console.log("Increased user 1 amount by 20");
+    const balanceStr1 = await contract.call("get_balance", [1]);
+    const balance1 = parseInt(balanceStr1);
+    expect(balance1).to.equal(20);
+
+    await contract.invoke("increase_balance", [2, 20]);
+    console.log("Increased user 2 amount by 20");
+    const balanceStr2 = await contract.call("get_balance", [2]);
+    const balance2 = parseInt(balanceStr2);
+    expect(balance2).to.equal(20);*/
+
+    
+  });
+
+  /*
 
   it("should work for a fresh deployment", async function () {
     const contract: StarknetContract = await contractFactory.deploy();
@@ -57,5 +79,5 @@ describe("Starknet", function () {
     const balanceStr = await contract.call("get_balance", [1]);
     const balance = parseInt(balanceStr);
     expect(balance).to.equal(30);
-  });
+  });*/
 });
