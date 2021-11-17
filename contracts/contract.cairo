@@ -43,6 +43,7 @@ func increase_balance{
         syscall_ptr : felt*, pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
         user_id : felt, amount : felt):
+    assert_nn(amount)
     let (res) = balance.read(user_id=user_id)
     balance.write(user_id, res + amount)
     return ()
