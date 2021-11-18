@@ -69,7 +69,7 @@ func increase_balance{
 end
 
 @external
-func create_bet{
+func createBet{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr, ecdsa_ptr : SignatureBuiltin*}(
@@ -134,7 +134,7 @@ func joinCounterBettor{
 end
 
 @external
-func vote_bettor{
+func voteBettor{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr, ecdsa_ptr : SignatureBuiltin*}(
@@ -178,7 +178,7 @@ func vote_bettor{
 end
 
 @external
-func join_judge{
+func joinJudge{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
