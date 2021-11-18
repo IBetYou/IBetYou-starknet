@@ -160,9 +160,9 @@ func voteBettor{
     let (b2) = counterBettor.read()
     let (j) = bet_judge.read()
     assert_nn(amt)
-    assert_nn(b1)
-    assert_nn(b2)
-    assert_nn(j)
+    #assert_nn(b1)
+    #assert_nn(b2)
+    #assert_nn(j)
     assert j = judge
     let (res) = balance.read(user_id=bettor_id)
     let (prize) = bet_reserve_amount.read()
