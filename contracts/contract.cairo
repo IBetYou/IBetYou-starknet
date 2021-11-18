@@ -49,8 +49,8 @@ func increase_balance{
 end
 
 struct Bet:
-    member Better: felt
-    member AntiBetter: felt
+    member Bettor: felt
+    member CounterBettor: felt
     member Judge: felt
     member Amount: felt
 end
@@ -81,8 +81,8 @@ func create_bet{
     let (j) = bet_judge.read()
     let (amt) = bet_amount.read()
     return( res = Bet (
-        Better = b1,
-        AntiBetter = b2,
+        Bettor = b1,
+        CounterBettor = b2,
         Judge = j,
         Amount = amt,
         )
@@ -114,8 +114,8 @@ func joinCounterBettor{
     let (amt) = bet_amount.read()
     
     return( res = Bet (
-        Better = b1,
-        AntiBetter = b2,
+        Bettor = b1,
+        CounterBettor = b2,
         Judge = j,
         Amount = amt,
         )
@@ -150,8 +150,8 @@ func vote_bettor{
     bet_reserve_amount.write(0)    
     
     return( res = Bet (
-        Better = b1,
-        AntiBetter = b2,
+        Bettor = b1,
+        CounterBettor = b2,
         Judge = j,
         Amount = amt,
         )
@@ -173,8 +173,8 @@ func join_judge{
     let (amt) = bet_amount.read()
     
     return( res = Bet (
-        Better = b1,
-        AntiBetter = b2,
+        Bettor = b1,
+        CounterBettor = b2,
         Judge = j,
         Amount = amt,
         )

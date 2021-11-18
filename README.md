@@ -82,12 +82,12 @@ starknet invoke \
     --inputs 1 100 100981
 ```
 
-### User 2 joins the  bet as antibetter
+### User 2 joins the  bet as counterbettor
 ```
 starknet invoke \
     --address $CONTRACT_ADDRESS \
     --abi contract_abi.json \
-    --function join_counter_better \
+    --function join_counter_bettor \
     --inputs 2
 ```
 
@@ -107,7 +107,7 @@ starknet invoke \
 starknet invoke \
     --address $CONTRACT_ADDRESS \
     --abi contract_abi.json \
-    --function vote_better \
+    --function vote_bettor \
     --inputs 3 1
 ```
 

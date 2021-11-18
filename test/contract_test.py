@@ -33,7 +33,7 @@ async def test_increase_balance():
         contract_address=contract_address,
     )
     #user_id 1 = bettor
-    #user_id 2 = anti_bettor
+    #user_id 2 = counter_bettor
     #user_id 3 = judge
     # Invoke increase_balance().
     await contract.increase_balance(user_id=1, amount=20).invoke()
@@ -48,7 +48,7 @@ async def test_increase_balance():
     assert await contract.get_balance(user_id=1).call() == (10,)
     # User_id 2 joins the bet
     await contract.joinCounterBettor(user_id=2).invoke()
-    # Check if amount is deducted from anti bettor account
+    # Check if amount is deducted from counter bettor account
     assert await contract.get_balance(user_id=2).call() == (10,)
     #judge joins the bet
     await contract.join_judge(user_id=3).invoke()
