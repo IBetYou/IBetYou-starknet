@@ -48,26 +48,35 @@ async def test_increase_balance():
     # Counter Bettor private key
     private_key_2 = 54321
     # Judge private key
-    private_key_3 = 51423
+    private_key_3 = 121212
     public_key_1 = private_to_stark_key(private_key_1)
     user_1_message_hash = pedersen_hash(public_key_1)
     public_key_2 = private_to_stark_key(private_key_2)
     public_key_3 = private_to_stark_key(private_key_3)
     judge_message_hash = pedersen_hash(public_key_1)
 
+    print(f'User 1 Public Key: {public_key_1}')
+    print(f'User 2 Public Key: {public_key_2}')
+    print(f'Judge Public Key: {public_key_3}')
     # Generate Hashes for the messages
     balance_signature_1 = sign(
         msg_hash=balance_ammount_message_hash, priv_key=private_key_1)
     balance_signature_2 = sign(
         msg_hash=balance_ammount_message_hash, priv_key=private_key_2)
 
+    print(f'User 1 Balance Signature: {balance_signature_1}')
+    print(f'User 2 Balance Signature: {balance_signature_2}')
+
     bet_amount_signature_1 = sign(
         msg_hash=bet_amount_message_hash, priv_key=private_key_1)
-    bet_amount_signature_2 = sign(
-        msg_hash=bet_amount_message_hash, priv_key=private_key_2)
+
+    print(f'User 1 Create Bet Signature: {bet_amount_signature_1}')
 
     judge_signature = sign(
         msg_hash=judge_message_hash, priv_key=private_key_3)
+
+        
+    print(f'Judge Vote Signature: {judge_signature}')
     # Invoke increase_balance().
     await contract.increase_balance(user_id=public_key_1, amount=balance_amount).invoke(signature=list(balance_signature_1))
     await contract.increase_balance(user_id=public_key_2, amount=balance_amount).invoke(signature=list(balance_signature_2))
@@ -81,8 +90,8 @@ async def test_increase_balance():
     assert balance_1 == (balance_amount,)
     assert balance_2 == (balance_amount,)
 
-    print(f'Balance of User {public_key_1}: {balance_1}')
-    print(f'Balance of User {public_key_2}: {balance_2}')
+    print(f'Balance of User 1: {balance_1}')
+    print(f'Balance of User 2: {balance_2}')
 
     # Create bet by bettor
     await contract.createBet(user_id=public_key_1, amount=10, bet=10098).invoke(signature=list(bet_amount_signature_1))
@@ -90,7 +99,7 @@ async def test_increase_balance():
     execution_info_1=await contract.get_balance(user_id=public_key_1).call()
     balance_1= execution_info_1.result
     assert balance_1 == (balance_amount-bet_amount,)
-    print(f'Balance of User {public_key_1} after placing bet: {balance_1}')
+    print(f'Balance of User 1 after placing bet: {balance_1}')
 
     # User_id 2 joins the bet
     await contract.joinCounterBettor(user_id=public_key_2).invoke()
@@ -98,7 +107,7 @@ async def test_increase_balance():
     execution_info_2= await contract.get_balance(user_id=public_key_2).call()
     balance_2= execution_info_2.result
     assert balance_2 == (balance_amount-bet_amount,)
-    print(f'Balance of User {public_key_2} after joining bet: {balance_2}')
+    print(f'Balance of User 2 after joining bet: {balance_2}')
 
     #judge joins the bet
     await contract.joinJudge(user_id=public_key_3).invoke()
@@ -114,6 +123,6 @@ async def test_increase_balance():
     execution_info_2=await contract.get_balance(user_id=public_key_2).call()
     balance_2= execution_info_2.result
     assert balance_2 == (balance_amount-bet_amount,)
-    print(f'Balance of User {public_key_1} after winning bet: {balance_1}')
-    print(f'Balance of User {public_key_2} after losing bet: {balance_2}')
+    print(f'Balance of User 1 after winning bet: {balance_1}')
+    print(f'Balance of User 2 after losing bet: {balance_2}')
 
