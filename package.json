@@ -7,12 +7,13 @@
     "test": "test"
   },
   "dependencies": {
+    "elliptic": "^6.5.4",
     "typescript": "^4.4.4"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@shardlabs/starknet-hardhat-plugin": "latest",
+    "@shardlabs/starknet-hardhat-plugin": "^0.3.1",
     "@types/mocha": "^9.0.0",
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.4.0",
