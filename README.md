@@ -2,7 +2,7 @@
 - Node.js v12.22.4
 - npm/npx v7.21.1
 - Docker v20.10.8
-- Cairo 0.5.1
+- Cairo 0.6.0
 
 ## Install Dependencies
 ```
@@ -51,44 +51,47 @@ Add balance to user 1 and user 2
 ```
 starknet invoke \
     --address $CONTRACT_ADDRESS \
-    --abi contract_abi.json \
-    --function increase_balance  --input 1 1000
+    --abi build/contract_abi.json \
+    --function increase_balance  --input $BETTOR_PUBLIC_KEY 1000 \
+    --signature $BETTER_SIGN_PART_1 $BETTER_SIGN_PART_2
 ```
 ```
 starknet invoke \
     --address $CONTRACT_ADDRESS \
-    --abi contract_abi.json \
-    --function increase_balance  --input 2 1000
+    --abi build/contract_abi.json \
+    --function increase_balance  --input $COUNTER_BETTOR_PUBLIC_KEY 1000 \
+    --signature $COUNTER_BETTER_SIGN_PART_1 $COUNTER_BETTER_SIGN_PART_2
 ```
 
 View balance of user 1 and user 2
 
 ```
 starknet call --address $CONTRACT_ADDRESS \
-    --abi contract_abi.json \
-    --function get_balance --input 1
+    --abi build/contract_abi.json \
+    --function get_balance --input $BETTOR_PUBLIC_KEY
 ```
 ```
 starknet call --address $CONTRACT_ADDRESS \
-    --abi contract_abi.json \
-    --function get_balance --input 2
+    --abi build/contract_abi.json \
+    --function get_balance --input $COUNTER_BETTOR_PUBLIC_KEY
 ```
-### Create a bet by user 1
+### Create a bet
 ```
 starknet invoke \
     --address $CONTRACT_ADDRESS \
-    --abi contract_abi.json \
-    --function create_bet \
-    --inputs 1 100 100981
+    --abi build/contract_abi.json \
+    --function createBet \
+    --inputs $BETTOR_PUBLIC_KEY $AMOUNT $BET_TEXT
+    --signature $BETTER_SIGN_BETAMOUNT_PART_1 $BETTER_SIGN_BETAMOUNT_PART_2
 ```
 
 ### User 2 joins the  bet as counterbettor
 ```
 starknet invoke \
     --address $CONTRACT_ADDRESS \
-    --abi contract_abi.json \
-    --function join_counter_bettor \
-    --inputs 2
+    --abi build/contract_abi.json \
+    --function joinCounterBettor \
+    --inputs $COUNTER_BETTOR_PUBLIC_KEY
 ```
 
 ### User 3 joins the bet as judge
@@ -96,9 +99,9 @@ starknet invoke \
 ```
 starknet invoke \
     --address $CONTRACT_ADDRESS \
-    --abi contract_abi.json \
-    --function join_judge \
-    --inputs 3
+    --abi build/contract_abi.json \
+    --function joinJudge \
+    --inputs $JUDGE_PUBLIC_KEY
 ```
 
 ### Judge (user 3) votes user 1 as winner
@@ -106,9 +109,10 @@ starknet invoke \
 ```
 starknet invoke \
     --address $CONTRACT_ADDRESS \
-    --abi contract_abi.json \
-    --function vote_bettor \
-    --inputs 3 1
+    --abi build/contract_abi.json \
+    --function voteBettor \
+    --inputs $JUDGE_PUBLIC_KEY $BETTOR_PUBLIC_KEY
+    --signature $JUDGE_SIGN_PART_1 $JUDGE_SIGN_PART_2
 ```
 
 Now, after the transaction is verified, verify the balance of user 1, it should get increased by 2x of the bet amount
