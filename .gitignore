@@ -21,6 +21,8 @@ lib64/
 parts/
 sdist/
 var/
+cache/
+starknet-artifacts/
 wheels/
 pip-wheel-metadata/
 share/python-wheels/
@@ -129,3 +131,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+node_modules
+.DS_Store
