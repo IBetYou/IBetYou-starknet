@@ -5,7 +5,7 @@ import { StarknetContract, StarknetContractFactory } from "hardhat/types/runtime
 const starkwareCrypto = require('../lib/crypto/starkware/crypto/signature/signature.js');
 
 describe("Starknet", function () {
-  this.timeout(700_000); // 5 min
+  this.timeout(300_000); // 5 min
   let preservedAddress: string;
 
   let contractFactory: StarknetContractFactory;
@@ -51,7 +51,6 @@ describe("Starknet", function () {
     const contract: StarknetContract = await contractFactory.deploy();
     console.log("Deployed at", contract.address);
     preservedAddress = contract.address;
-  //  preservedAddress = "0x0574bf5c80241f960f6bbc9058bcd5ec5ec25e5d9ba3f789f5119495e36d5ad0";
     
     var r = "0x" + balance_signature_bettor.r.toString(16);
     var s = "0x" + balance_signature_bettor.s.toString(16);
