@@ -10,7 +10,7 @@ npm install
 ```
 
 
-###The "crypto" folder from the following git repository has to be manually added in the lib/ folder on the project root
+### The "crypto" folder from the following git repository has to be manually added in the lib/ folder on the project root
 ```
 https://github.com/starkware-libs/starkex-resources
 ```
