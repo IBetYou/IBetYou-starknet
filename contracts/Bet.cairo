@@ -15,7 +15,6 @@ from starkware.cairo.common.cairo_builtins import (
 from starkware.cairo.common.hash import hash2
 from starkware.cairo.common.signature import (
     verify_ecdsa_signature)
-from starkware.starknet.common.syscalls import get_tx_signature
 
 struct Bet:
     member bettor: felt
@@ -29,6 +28,7 @@ struct Bet:
     member bettor_judge_voted: felt
     member counter_bettor_judge_voted: felt
     member bet_winner: felt
+    member admin: felt
 end
 
 struct BetStateEnum:
@@ -55,6 +55,15 @@ end
 #                                                   #
 #####################################################
 
+######
+#
+#   Viewer functions
+#
+######
+
+#/
+#/  Get the winner of the bet
+#/
 @view
 func get_bet_winner{
         syscall_ptr : felt*, 
@@ -64,6 +73,10 @@ func get_bet_winner{
     let (res) = _bet.read(Bet.bet_winner)
     return (res)
 end
+
+#/
+#/  Get the amount of the bet
+#/
 @view
 func get_bet_amount{
         syscall_ptr : felt*, 
@@ -74,7 +87,9 @@ func get_bet_amount{
     return (res)
 end
 
-
+#/
+#/  Get current status of the bet
+#/
 @view
 func get_bet_status{
         syscall_ptr : felt*, 
@@ -92,6 +107,7 @@ func get_bet_status{
     let (bettor_judge_voted) = _bet.read(Bet.bettor_judge_voted)
     let (counter_bettor_judge_voted) = _bet.read(Bet.counter_bettor_judge_voted)
     let (bet_winner) = _bet.read(Bet.bet_winner)
+    let (admin) = _bet.read(Bet.admin)
 
     let res  = Bet(
         bettor=bettor,
@@ -104,32 +120,48 @@ func get_bet_status{
         num_votes_counter_bettor=num_votes_counter_bettor,
         bettor_judge_voted=bettor_judge_voted,
         counter_bettor_judge_voted=counter_bettor_judge_voted,
-        bet_winner=bet_winner
+        bet_winner=bet_winner,
+        admin=admin
     )
     return (res)
 end
 
+
+
+######
+#
+#   Business logic
+#
+######
+
+#/
+#/  Creates the bet, assigning a user to the role of bettor
+#/
 @external
 func create_bet{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
-        user_id : felt, amount : felt):
+        user_id : felt, amount : felt, admin_id : felt):
     let (betState) = _bet.read(Bet.bet_state)
     assert betState = 0
     _bet.write(Bet.bet_state, BetStateEnum.ASSIGNING_PARTICIPANTS)
     _bet.write(Bet.bettor, user_id)
+    _bet.write(Bet.admin, admin_id)
     _bet.write(Bet.bet_amount, amount)
     return()
 end
 
-
+#/
+#/  Assigns a user to the role of the counter bettor
+#/
 @external
 func join_counter_bettor{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
         user_id : felt):
+
     # Validate bet state
     let (betState) = _bet.read(Bet.bet_state)
     assert betState = BetStateEnum.ASSIGNING_PARTICIPANTS
@@ -145,17 +177,22 @@ func join_counter_bettor{
     assert_not_equal(user_id,bettor)
     assert_not_equal(user_id,bettor_judge)
     assert_not_equal(user_id,counter_bettor_judge)
+
     _bet.write(Bet.counter_bettor, user_id)
     check_participants_bet_status()
     return()
 end
 
+#/
+#/  Assigns a user to the role of the bettor's judge
+#/
 @external
 func join_bettor_judge{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
         user_id : felt):
+        
     # Validate bet state
     let (betState) = _bet.read(Bet.bet_state)
     assert betState = BetStateEnum.ASSIGNING_PARTICIPANTS
@@ -171,17 +208,23 @@ func join_bettor_judge{
     assert_not_equal(user_id,bettor)
     assert_not_equal(user_id,counter_bettor)
     assert_not_equal(user_id,counter_bettor_judge)
+
     _bet.write(Bet.bettor_judge, user_id)
     check_participants_bet_status()
     return()
 end
 
+
+#/
+#/  Assigns a user to the role of the counter bettor's judge
+#/
 @external
 func join_counter_bettor_judge{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
         user_id : felt):
+
     # Validate bet state
     let (betState) = _bet.read(Bet.bet_state)
     assert betState = BetStateEnum.ASSIGNING_PARTICIPANTS
@@ -197,40 +240,34 @@ func join_counter_bettor_judge{
     assert_not_equal(user_id,bettor)
     assert_not_equal(user_id,counter_bettor)
     assert_not_equal(user_id,bettor_judge)
+
     _bet.write(Bet.counter_bettor_judge, user_id)
     check_participants_bet_status()
     return()
 end
 
-
+#/
+#/  Casts the vote of the bettor's judge
+#/
 @external
 func bettor_judge_vote{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
         user_id : felt):
-    # let (sig_len : felt, sig : felt*) = get_tx_signature()
+
     # Validate bet state
     let (betState) = _bet.read(Bet.bet_state)
     assert betState = BetStateEnum.VOTING_STAGE
+    let (bettor_judge) = _bet.read(Bet.bettor_judge)
+    assert_not_zero(bettor_judge)
 
-    # Validate that the user calling this function is the judge
-    # Compute the hash of the message.
-    # The hash of (x, 0) is equivalent to the hash of (x).
-    let (bettor_judge_id) = _bet.read(Bet.bettor_judge)
-    let (bettor_id_hash) = hash2{hash_ptr=pedersen_ptr}(bettor_judge_id, 0)
-
-    # Verify the user's signature.
-    #verify_ecdsa_signature(
-    #    message=bettor_id_hash,
-     #   public_key=judge,
-      #  signature_r=sig[0],
-       # signature_s=sig[1])
-
-    # Validate that bettor judge hasn't voted yet
+    # Validate that this judge hasn't voted yet
     let (bettor_judge_voted) = _bet.read(Bet.bettor_judge_voted)
     assert bettor_judge_voted = 0
     _bet.write(Bet.bettor_judge_voted, 1)
+
+    # Add vote to selected user
     let (bettor_id) = _bet.read(Bet.bettor)
     let (counter_bettor_id) = _bet.read(Bet.counter_bettor)
     let (num_votes_bettor) = _bet.read(Bet.num_votes_bettor)
@@ -246,38 +283,34 @@ func bettor_judge_vote{
     return()
 end
 
+
+#/
+#/  Casts the vote of the counter bettor's judge
+#/
 @external
 func counter_bettor_judge_vote{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
         user_id : felt):
-    # let (sig_len : felt, sig : felt*) = get_tx_signature()
+
     # Validate bet state
     let (betState) = _bet.read(Bet.bet_state)
     assert betState = BetStateEnum.VOTING_STAGE
+    let (counter_bettor_judge) = _bet.read(Bet.counter_bettor_judge)
+    assert_not_zero(counter_bettor_judge)
 
-    # Validate that the user calling this function is the judge
-    # Compute the hash of the message.
-    # The hash of (x, 0) is equivalent to the hash of (x).
-    let (counter_bettor_judge_id) = _bet.read(Bet.bettor_judge)
-    let (bettor_id_hash) = hash2{hash_ptr=pedersen_ptr}(counter_bettor_judge_id, 0)
-
-    # Verify the user's signature.
-    #verify_ecdsa_signature(
-    #    message=bettor_id_hash,
-     #   public_key=judge,
-      #  signature_r=sig[0],
-       # signature_s=sig[1])
-
-    # Validate that bettor judge hasn't voted yet
+    # Validate that this judge hasn't voted yet
     let (counter_bettor_judge_voted) = _bet.read(Bet.counter_bettor_judge_voted)
     assert counter_bettor_judge_voted = 0
     _bet.write(Bet.counter_bettor_judge_voted, 1)
+
+    # Add vote to selected user
     let (bettor_id) = _bet.read(Bet.bettor)
     let (counter_bettor_id) = _bet.read(Bet.counter_bettor)
     let (num_votes_bettor) = _bet.read(Bet.num_votes_bettor)
     let (num_votes_counter_bettor) = _bet.read(Bet.num_votes_counter_bettor)
+
     if bettor_id == user_id:   
        _bet.write(Bet.num_votes_bettor, num_votes_bettor+1)
     else:
@@ -288,34 +321,24 @@ func counter_bettor_judge_vote{
     return()
 end
 
-
+#/
+#/  The admin solves the dispute by voting, if a bet is in the dispute stage
+#/
 @external
-func dispute_vote{
+func solve_dispute{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(
-        voter_id : felt, user_id : felt):
-    # let (sig_len : felt, sig : felt*) = get_tx_signature()
+        user_id : felt):
+
     # Validate bet state
     let (betState) = _bet.read(Bet.bet_state)
     assert betState = BetStateEnum.DISPUTE
+    let (admin) = _bet.read(Bet.admin)
+    assert_not_zero(admin)
 
-    # Validate that the user calling this function is the judge
-    # Compute the hash of the message.
-    # The hash of (x, 0) is equivalent to the hash of (x).
-    let (voter_id_hash) = hash2{hash_ptr=pedersen_ptr}(voter_id, 0)
-
-    # Verify the user's signature.
-    #verify_ecdsa_signature(
-    #    message=bettor_id_hash,
-     #   public_key=voter_id,
-      #  signature_r=sig[0],
-       # signature_s=sig[1])
-
-    # Validate that bettor judge hasn't voted yet
-    let (counter_bettor_judge_voted) = _bet.read(Bet.counter_bettor_judge_voted)
-    assert counter_bettor_judge_voted = 0
-    _bet.write(Bet.counter_bettor_judge_voted, 1)
+    
+    # Add vote to selected user# Add vote to selected user
     let (bettor_id) = _bet.read(Bet.bettor)
     let (counter_bettor_id) = _bet.read(Bet.counter_bettor)
     let (num_votes_bettor) = _bet.read(Bet.num_votes_bettor)
@@ -326,13 +349,43 @@ func dispute_vote{
         assert counter_bettor_id = user_id
         _bet.write(Bet.num_votes_counter_bettor, num_votes_counter_bettor+1)
     end
-    check_voting_status()
+    _bet.write(Bet.bet_winner,user_id)
+    _bet.write(Bet.bet_state,BetStateEnum.FUNDS_WITHDRAWAL)
+    
     return()
 end
 
 
+#/
+#/  Closes a bet
+#/
+@external
+func set_bet_over{
+        syscall_ptr : felt*, 
+        pedersen_ptr : HashBuiltin*,
+        range_check_ptr}():
 
+    # Validate bet state
+    let (betState) = _bet.read(Bet.bet_state)
+    assert betState = BetStateEnum.FUNDS_WITHDRAWAL
+    
+    _bet.write(Bet.bet_state,BetStateEnum.BET_OVER)
+    
+    return()
+end
 
+#####################################################
+#                                                   #
+#            Internal helper functions              #
+#                                                   #
+#####################################################
+
+#/
+#/  Checks current voting status of bet
+#/  If a judge hasn't voted yet, it remains in voting stage
+#/  If both judges voted for the same user, the bet enters the withdrawal stage, where it waits for the winner to claim the reward
+#/  If both judges voted for different users, the bet enters the dispute stage, where it waits for the admin to solve the dispute
+#/
 func check_voting_status{
         syscall_ptr : felt*,
         pedersen_ptr : HashBuiltin*,
@@ -372,6 +425,11 @@ func check_voting_status{
     return()
 end
 
+#/
+#/  Checks current status of participant assignment
+#/  If a role has not yet been filled, bet remains in the assignment stage
+#/  If all roles have been assigned a user, it enters the voting stage
+#/
 func check_participants_bet_status{
         syscall_ptr : felt*,
         pedersen_ptr : HashBuiltin*,
