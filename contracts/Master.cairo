@@ -186,7 +186,7 @@ func withdraw_funds{
     
     let (amount) = IBet.get_bet_amount(bet_address)
     IBet.set_bet_over(bet_address)
-    IAccount.add_balance(account_address,winner_id,2*amount)
+    IAccount.add_balance(account_address,winner_id,amount+amount)
     return()
 end
 
