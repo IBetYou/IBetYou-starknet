@@ -7,6 +7,8 @@ from starkware.starknet.testing.starknet import Starknet
 from starkware.starknet.testing.contract import StarknetContract
 from starkware.crypto.signature.signature import (
     pedersen_hash, private_to_stark_key, sign)
+
+from starkware.starknet.public.abi import get_storage_var_address
 # The path to the contract source code.
 # my change: modified the path to adapt to the file system
 CONTRACT_FILE = os.path.join(
@@ -75,7 +77,8 @@ async def test_increase_balance():
     judge_signature = sign(
         msg_hash=judge_message_hash, priv_key=private_key_3)
 
-        
+    bettor_storage_key = get_storage_var_address('bet_judge')
+    print(f'bettor_storage_key: {bettor_storage_key}')
     print(f'Judge Vote Signature: {judge_signature}')
     # Invoke increase_balance().
     await contract.increase_balance(user_id=public_key_1, amount=balance_amount).invoke(signature=list(balance_signature_1))
