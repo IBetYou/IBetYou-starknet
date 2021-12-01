@@ -235,9 +235,14 @@ func check_winner{
         range_check_ptr}(bet_address : felt) -> ():
         
     let (res) = IBet.get_bet_winner(bet_address)
-    _bet_map.write(bet_address,BetUsers.winner,res)
+    if res != 0:
+        _bet_map.write(bet_address,BetUsers.winner,res)
+        return()
+    end
     return()
 end
+
+
 @view
 func get_winner{
         syscall_ptr : felt*,
