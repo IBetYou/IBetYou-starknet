@@ -16,7 +16,7 @@ module.exports = {
     }
   },
   mocha: {
-    starknetNetwork: "starknetLocalhost"
+   starknetNetwork: "starknetLocalhost"
     //starknetNetwork: "alpha"
   }
 };
