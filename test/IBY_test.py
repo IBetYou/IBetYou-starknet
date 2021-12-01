@@ -254,7 +254,7 @@ async def test_state_validations():
     assert str(excinfo.value.code) == "StarknetErrorCode.TRANSACTION_FAILED"
 
 
-    # Counter bettor's judge joins the bet
+    # Users join the bet
     await master_contract.join_counter_bettor(user_id=counter_bettor_id,amount=bet_amount, bet_address=bet_contract.contract_address, account_address=account_contract.contract_address).invoke()
     await master_contract.join_bettor_judge(user_id=bettor_judge_id,bet_address=bet_contract.contract_address).invoke()
     await master_contract.join_counter_bettor_judge(user_id=counter_bettor_judge_id,bet_address=bet_contract.contract_address).invoke()
@@ -316,6 +316,9 @@ async def test_state_validations():
     bet_state = bet_status.result.bet.bet_state
     assert bet_state == 3
     assert bet_winner == bettor_id
+
+    bet_status = await master_contract.get_winner(bet_address=bet_contract.contract_address).call()
+    bet_winner = bet_status.result
     print(f'Winner is user {bet_winner}')
 
     #Withdraw funds to user 1's account and confirm bet is over

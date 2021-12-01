@@ -179,7 +179,8 @@ end
 func withdraw_funds{
         syscall_ptr : felt*,
         pedersen_ptr : HashBuiltin*,
-        range_check_ptr}(bet_address : felt,account_address : felt):
+        range_check_ptr}(
+        bet_address : felt, account_address : felt):
     
     let (winner_id) = _bet_map.read(bet_address,BetUsers.winner)
     assert_not_zero(winner_id)
@@ -232,11 +233,16 @@ func check_winner{
         syscall_ptr : felt*,
         pedersen_ptr : HashBuiltin*,
         range_check_ptr}(bet_address : felt) -> ():
+        
     let (res) = IBet.get_bet_winner(bet_address)
-    if res == 0:
-        return()
-    else:
-        _bet_map.write(bet_address,BetUsers.winner,res)
-        return()
-    end
+    _bet_map.write(bet_address,BetUsers.winner,res)
+    return()
+end
+@view
+func get_winner{
+        syscall_ptr : felt*,
+        pedersen_ptr : HashBuiltin*,
+        range_check_ptr}(bet_address : felt) -> (res : felt):
+    let (res) = _bet_map.read(bet_address,BetUsers.winner)
+    return(res)
 end
