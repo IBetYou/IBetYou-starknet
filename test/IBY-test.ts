@@ -3,7 +3,7 @@ import { starknet } from "hardhat";
 import { StarknetContract, StarknetContractFactory } from "hardhat/types/runtime";
 
 describe("Starknet", function () {
-  this.timeout(300_000); // 5 min
+  this.timeout(700_000); // 5 min
   let accountContractAddress: string;
   let masterContractAddress: string;
   
